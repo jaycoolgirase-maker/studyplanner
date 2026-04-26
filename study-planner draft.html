@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlanDesk — Study Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #ffffff;
+      --grey-100: #f5f5f5;
+      --grey-200: #e8e8e8;
+      --grey-300: #d0d0d0;
+      --grey-400: #a0a0a0;
+      --grey-500: #707070;
+      --grey-600: #484848;
+      --grey-700: #282828;
+      --grey-800: #181818;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--white);
+      color: var(--black);
+      min-height: 100vh;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--white);
+      border-bottom: 1px solid var(--grey-200);
+      padding: 0 32px;
+    }
+
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--black);
+    }
+
+    .logo sup {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--grey-400);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      vertical-align: super;
+      margin-left: 4px;
+    }
+
+    nav { display: flex; gap: 2px; }
+
+    .nav-btn {
+      padding: 7px 16px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      border: 1px solid transparent;
+      background: none;
+      cursor: pointer;
+      color: var(--grey-500);
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+
+    .nav-btn:hover { color: var(--black); background: var(--grey-100); }
+
+    .nav-btn.active {
+      color: var(--black);
+      background: var(--grey-100);
+      border-color: var(--grey-200);
+      font-weight: 500;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 32px 100px;
+    }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* COUNTDOWN HERO */
+    .countdown-hero {
+      border-radius: 16px;
+      padding: 52px 44px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--black);
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .countdown-hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.05);
+      pointer-events: none;
+    }
+
+    .countdown-hero::after {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.07);
+      pointer-events: none;
+    }
+
+    .hero-left { z-index: 1; }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .hero-sub {
+      font-size: 13px;
+      color: rgba(255,255,255,0.38);
+      font-weight: 300;
+    }
+
+    .countdown-right {
+      z-index: 1;
+      text-align: right;
+    }
+
+    .countdown-days {
+      font-family: 'Syne', sans-serif;
+      font-size: 96px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.05em;
+      color: var(--white);
+    }
+
+    .countdown-unit {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-top: 6px;
+    }
+
+    /* STATS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      border: 1px solid var(--grey-200);
+      border-radius: 12px;
+      padding: 20px 22px;
+    }
+
+    .stat-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--black);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--grey-400);
+      margin-top: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    /* CARDS */
+    .card {
+      border: 1px solid var(--grey-200);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-400);
+      margin-bottom: 20px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 7px; }
+
+    .field label {
+      font-size: 12px;
+      color: var(--grey-500);
+      letter-spacing: 0.02em;
+    }
+
+    .field input, .field select {
+      width: 100%;
+      padding: 10px 13px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      border: 1px solid var(--grey-200);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--black);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .field input:focus, .field select:focus { border-color: var(--grey-500); }
+
+    .subj-header {
+      display: grid;
+      grid-template-columns: 2fr 100px 100px 36px;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .subj-header span {
+      font-size: 11px;
+      color: var(--grey-400);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .subject-row {
+      display: grid;
+      grid-template-columns: 2fr 100px 100px 36px;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .subject-row input, .subject-row select {
+      padding: 9px 12px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      border: 1px solid var(--grey-200);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--black);
+      width: 100%;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .subject-row input:focus, .subject-row select:focus { border-color: var(--grey-500); }
+
+    .del-btn {
+      width: 36px; height: 36px;
+      border: 1px solid var(--grey-200);
+      border-radius: 8px;
+      background: none;
+      cursor: pointer;
+      color: var(--grey-400);
+      font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .del-btn:hover { border-color: var(--grey-400); color: var(--black); background: var(--grey-100); }
+
+    .add-btn {
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      color: var(--grey-500);
+      background: none;
+      border: 1px dashed var(--grey-300);
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 4px;
+      transition: all 0.15s;
+    }
+
+    .add-btn:hover { background: var(--grey-100); color: var(--black); border-color: var(--grey-400); }
+
+    .gen-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      margin-top: 6px;
+      letter-spacing: 0.02em;
+      transition: opacity 0.15s;
+    }
+
+    .gen-btn:hover { opacity: 0.75; }
+
+    /* SCHEDULE */
+    .day-block { margin-bottom: 22px; }
+
+    .day-header {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--grey-400);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--grey-200);
+      margin-bottom: 12px;
+    }
+
+    .session-pills { display: flex; flex-wrap: wrap; gap: 7px; }
+
+    .pill {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      border: 1px solid var(--grey-200);
+      color: var(--grey-600);
+      background: var(--grey-100);
+    }
+
+    .pill.high-pri { background: var(--black); color: var(--white); border-color: var(--black); }
+    .pill.med-pri { background: var(--grey-700); color: var(--white); border-color: var(--grey-700); }
+
+    /* TODAY */
+    .today-banner {
+      background: var(--black);
+      color: var(--white);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .today-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 6px;
+    }
+
+    .today-count {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .check-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      background: var(--white);
+      border: 1px solid var(--grey-200);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+      user-select: none;
+    }
+
+    .check-item:hover { background: var(--grey-100); }
+    .check-item.done { opacity: 0.38; }
+    .check-item.done .check-text { text-decoration: line-through; }
+
+    .check-box {
+      width: 20px; height: 20px;
+      border: 1.5px solid var(--grey-300);
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 11px;
+      transition: all 0.15s;
+    }
+
+    .check-item.done .check-box {
+      background: var(--black);
+      border-color: var(--black);
+      color: var(--white);
+    }
+
+    .check-text { font-size: 14px; flex: 1; color: var(--black); }
+    .check-sub { font-size: 12px; color: var(--grey-400); margin-top: 2px; }
+
+    .pri-tag {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .pri-tag.high { background: var(--black); color: var(--white); }
+    .pri-tag.medium { background: var(--grey-200); color: var(--grey-600); }
+    .pri-tag.low { background: var(--grey-100); color: var(--grey-400); }
+
+    /* PROGRESS */
+    .prog-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .prog-name {
+      font-size: 13px;
+      width: 140px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .prog-bar-bg {
+      flex: 1;
+      height: 3px;
+      background: var(--grey-200);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .prog-bar { height: 100%; border-radius: 2px; background: var(--black); transition: width 0.5s ease; }
+
+    .prog-pct {
+      font-size: 12px;
+      color: var(--grey-400);
+      width: 34px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--grey-400);
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      main { padding: 24px 16px 80px; }
+      header { padding: 0 16px; }
+      .countdown-hero { flex-direction: column; gap: 20px; padding: 32px 24px; }
+      .countdown-right { text-align: left; }
+      .countdown-days { font-size: 64px; }
+      .field-row { grid-template-columns: 1fr; }
+      .subj-header, .subject-row { grid-template-columns: 1fr 80px 70px 36px; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .nav-btn { padding: 6px 10px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">PlanDesk<sup>Beta</sup></div>
+    <nav>
+      <button class="nav-btn active" onclick="switchTab('setup')">Setup</button>
+      <button class="nav-btn" onclick="switchTab('schedule')">Schedule</button>
+      <button class="nav-btn" onclick="switchTab('today')">Today</button>
+      <button class="nav-btn" onclick="switchTab('progress')">Progress</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- SETUP -->
+  <div id="tab-setup" class="section active">
+    <div class="card">
+      <div class="card-title">Exam Details</div>
+      <div class="field-row">
+        <div class="field">
+          <label>Exam / test date</label>
+          <input type="date" id="exam-date" />
+        </div>
+        <div class="field">
+          <label>Study hours per day</label>
+          <input type="number" id="hours-day" value="4" min="1" max="14" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Study start time</label>
+          <input type="time" id="start-time" value="09:00" />
+        </div>
+        <div class="field">
+          <label>Session length (minutes)</label>
+          <input type="number" id="session-len" value="60" min="5" placeholder="e.g. 60" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Break between sessions (minutes)</label>
+          <input type="number" id="break-len" value="10" min="0" placeholder="e.g. 10" />
+        </div>
+        <div class="field"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Subjects</div>
+      <div class="subj-header">
+        <span>Subject</span>
+        <span>Priority</span>
+        <span>Hours</span>
+        <span></span>
+      </div>
+      <div id="subjects-list"></div>
+      <button class="add-btn" onclick="addSubject()">+ Add subject</button>
+    </div>
+
+    <button class="gen-btn" onclick="generatePlan()">Generate study plan →</button>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div id="tab-schedule" class="section">
+    <div class="countdown-hero" id="countdown-hero" style="display:none;">
+      <div class="hero-left">
+        <div class="hero-eyebrow">Countdown</div>
+        <div class="hero-title" id="hero-exam-label">Exam Day</div>
+        <div class="hero-sub" id="hero-exam-date">—</div>
+      </div>
+      <div class="countdown-right">
+        <div class="countdown-days" id="countdown-days">—</div>
+        <div class="countdown-unit">days remaining</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-val" id="stat-sessions">—</div>
+        <div class="stat-label">Total sessions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-hrs">—</div>
+        <div class="stat-label">Study hours</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-subj">—</div>
+        <div class="stat-label">Subjects</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Full Schedule</div>
+      <div id="schedule-out"><div class="empty">Generate a plan from the Setup tab.</div></div>
+    </div>
+  </div>
+
+  <!-- TODAY -->
+  <div id="tab-today" class="section">
+    <div id="today-out"><div class="empty">Generate a plan from the Setup tab.</div></div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div id="tab-progress" class="section">
+    <div id="progress-out"><div class="empty">Generate a plan from the Setup tab.</div></div>
+  </div>
+
+</main>
+
+<script>
+  let subjects = [], plan = [], done = {};
+
+  // ── PERSISTENCE ────────────────────────────────────────────────
+  function saveAll() {
+    try {
+      const setupData = {
+        examDate: document.getElementById('exam-date').value,
+        hoursDay: document.getElementById('hours-day').value,
+        sessionLen: document.getElementById('session-len').value,
+        breakLen: document.getElementById('break-len').value,
+        startTime: document.getElementById('start-time').value,
+      };
+      // Serialize plan dates as ISO strings
+      const planSerial = plan.map(day => ({
+        date: day.date instanceof Date ? day.date.toISOString() : day.date,
+        sessions: day.sessions
+      }));
+      localStorage.setItem('plandesk_subjects', JSON.stringify(subjects));
+      localStorage.setItem('plandesk_plan', JSON.stringify(planSerial));
+      localStorage.setItem('plandesk_done', JSON.stringify(done));
+      localStorage.setItem('plandesk_setup', JSON.stringify(setupData));
+    } catch(e) {}
+  }
+
+  function loadAll() {
+    try {
+      const rawSubj = localStorage.getItem('plandesk_subjects');
+      const rawPlan = localStorage.getItem('plandesk_plan');
+      const rawDone = localStorage.getItem('plandesk_done');
+      const rawSetup = localStorage.getItem('plandesk_setup');
+
+      if (rawSetup) {
+        const s = JSON.parse(rawSetup);
+        if (s.examDate) document.getElementById('exam-date').value = s.examDate;
+        if (s.hoursDay) document.getElementById('hours-day').value = s.hoursDay;
+        if (s.sessionLen) document.getElementById('session-len').value = s.sessionLen;
+        if (s.breakLen !== undefined) document.getElementById('break-len').value = s.breakLen;
+        if (s.startTime) document.getElementById('start-time').value = s.startTime;
+      }
+
+      if (rawSubj) { subjects = JSON.parse(rawSubj); renderSubjects(); }
+      if (rawDone) done = JSON.parse(rawDone);
+
+      if (rawPlan) {
+        const planSerial = JSON.parse(rawPlan);
+        plan = planSerial.map(day => ({ ...day, date: new Date(day.date) }));
+
+        if (plan.length) {
+          // Restore countdown hero
+          const examDateVal = document.getElementById('exam-date').value;
+          if (examDateVal) {
+            const today = new Date(); today.setHours(0,0,0,0);
+            const exam = new Date(examDateVal); exam.setHours(0,0,0,0);
+            const daysLeft = Math.ceil((exam - today) / 86400000);
+            if (daysLeft >= 0) {
+              const hero = document.getElementById('countdown-hero');
+              hero.style.display = 'flex';
+              document.getElementById('countdown-days').textContent = daysLeft;
+              document.getElementById('hero-exam-date').textContent =
+                exam.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+            }
+          }
+          // Restore stats
+          let totalSess = 0;
+          plan.forEach(day => totalSess += day.sessions.length);
+          const sessionLen = +document.getElementById('session-len').value || 60;
+          document.getElementById('stat-sessions').textContent = totalSess;
+          document.getElementById('stat-hrs').textContent = Math.round(totalSess * sessionLen / 60);
+          document.getElementById('stat-subj').textContent = subjects.length;
+          renderSchedule();
+        }
+      }
+    } catch(e) {}
+  }
+
+  // Auto-save setup fields on change
+  function autoSaveSetup() { saveAll(); }
+  // ── END PERSISTENCE ─────────────────────────────────────────────
+
+  function switchTab(t) {
+    document.querySelectorAll('.nav-btn').forEach((el, i) =>
+      el.classList.toggle('active', ['setup','schedule','today','progress'][i] === t));
+    document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + t).classList.add('active');
+    if (t === 'today') renderToday();
+    if (t === 'progress') renderProgress();
+  }
+
+  function addSubject(name='', pri='medium', hrs=3) {
+    const id = Date.now() + '_' + Math.random().toString(36).slice(2);
+    subjects.push({ id, name, pri, hrs });
+    renderSubjects();
+    saveAll();
+  }
+
+  function removeSubject(id) {
+    subjects = subjects.filter(s => s.id !== id);
+    renderSubjects();
+    saveAll();
+  }
+
+  function renderSubjects() {
+    const el = document.getElementById('subjects-list');
+    if (!subjects.length) { el.innerHTML = ''; return; }
+    el.innerHTML = subjects.map(s => `
+      <div class="subject-row">
+        <input type="text" placeholder="e.g. Mathematics" value="${s.name}"
+          oninput="updateSubj('${s.id}','name',this.value)" />
+        <select onchange="updateSubj('${s.id}','pri',this.value)">
+          <option value="high" ${s.pri==='high'?'selected':''}>High</option>
+          <option value="medium" ${s.pri==='medium'?'selected':''}>Medium</option>
+          <option value="low" ${s.pri==='low'?'selected':''}>Low</option>
+        </select>
+        <input type="number" min="1" max="500" value="${s.hrs}"
+          oninput="updateSubj('${s.id}','hrs',+this.value)" placeholder="hrs" />
+        <button class="del-btn" onclick="removeSubject('${s.id}')">×</button>
+      </div>
+    `).join('');
+  }
+
+  function updateSubj(id, key, val) {
+    const s = subjects.find(s => s.id === id);
+    if (s) s[key] = val;
+    saveAll();
+  }
+
+  function generatePlan() {
+    const dateVal = document.getElementById('exam-date').value;
+    const hrsDay = +document.getElementById('hours-day').value || 4;
+    const sessionLen = +document.getElementById('session-len').value || 60;
+    const breakLen = +document.getElementById('break-len').value || 0;
+    const startTime = document.getElementById('start-time').value || '09:00';
+
+    if (!dateVal) { alert('Please set your exam date.'); return; }
+    if (!subjects.length) { alert('Please add at least one subject.'); return; }
+    if (sessionLen < 5) { alert('Session length must be at least 5 minutes.'); return; }
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const exam = new Date(dateVal); exam.setHours(0,0,0,0);
+    const daysLeft = Math.ceil((exam - today) / 86400000);
+    if (daysLeft < 1) { alert('Exam date must be in the future.'); return; }
+
+    const sessPerDay = Math.floor((hrsDay * 60) / (sessionLen + breakLen)) || 1;
+    const priWeight = { high: 3, medium: 2, low: 1 };
+    let pool = [];
+    subjects.forEach(s => {
+      const totalSess = Math.ceil((s.hrs * 60) / sessionLen);
+      for (let i = 0; i < totalSess; i++) pool.push({ ...s, sessIdx: i+1, total: totalSess });
+    });
+    pool.sort((a, b) => priWeight[b.pri] - priWeight[a.pri]);
+
+    plan = []; done = {};
+    let idx = 0;
+    for (let d = 0; d < daysLeft && idx < pool.length; d++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + d);
+      const daySess = [];
+      for (let s = 0; s < sessPerDay && idx < pool.length; s++) {
+        const item = pool[idx++];
+        const key = item.id + '_' + item.sessIdx;
+        done[key] = false;
+        let [h, m] = startTime.split(':').map(Number);
+        const offset = s * (sessionLen + breakLen);
+        const totalMins = h*60+m+offset;
+        const sh = Math.floor(totalMins/60)%24, sm = totalMins%60;
+        const eh = Math.floor((totalMins+sessionLen)/60)%24, em = (totalMins+sessionLen)%60;
+        const fmt = (hh, mm) => hh.toString().padStart(2,'0') + ':' + mm.toString().padStart(2,'0');
+        daySess.push({ ...item, key, timeLabel: fmt(sh,sm)+' – '+fmt(eh,em) });
+      }
+      if (daySess.length) plan.push({ date, sessions: daySess });
+    }
+
+    const hero = document.getElementById('countdown-hero');
+    hero.style.display = 'flex';
+    document.getElementById('countdown-days').textContent = daysLeft;
+    document.getElementById('hero-exam-date').textContent =
+      exam.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+    document.getElementById('stat-sessions').textContent = pool.length;
+    document.getElementById('stat-hrs').textContent = Math.round(pool.length * sessionLen / 60);
+    document.getElementById('stat-subj').textContent = subjects.length;
+
+    renderSchedule();
+    saveAll();
+    switchTab('schedule');
+  }
+
+  function fmtDate(date) {
+    return date.toLocaleDateString('en-IN', { weekday:'long', month:'short', day:'numeric' });
+  }
+
+  function renderSchedule() {
+    const el = document.getElementById('schedule-out');
+    if (!plan.length) { el.innerHTML = '<div class="empty">No sessions to show.</div>'; return; }
+    el.innerHTML = plan.map(day => `
+      <div class="day-block">
+        <div class="day-header">${fmtDate(day.date)}</div>
+        <div class="session-pills">
+          ${day.sessions.map(s => `
+            <div class="pill ${s.pri === 'high' ? 'high-pri' : s.pri === 'medium' ? 'med-pri' : ''}">
+              ${s.name || 'Subject'} &middot; ${s.timeLabel}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderToday() {
+    const el = document.getElementById('today-out');
+    if (!plan.length) { el.innerHTML = '<div class="empty">Generate a plan from the Setup tab.</div>'; return; }
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayPlan = plan.find(d => { const dd = new Date(d.date); dd.setHours(0,0,0,0); return dd.getTime()===today.getTime(); });
+    if (!todayPlan) { el.innerHTML = '<div class="empty">No sessions scheduled for today.<br>Check the Schedule tab.</div>'; return; }
+
+    const completedCount = todayPlan.sessions.filter(s => done[s.key]).length;
+    el.innerHTML = `
+      <div class="today-banner">
+        <div>
+          <div class="today-eyebrow">Today</div>
+          <div class="today-count">${todayPlan.sessions.length} sessions scheduled</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="today-eyebrow">Completed</div>
+          <div class="today-count">${completedCount} / ${todayPlan.sessions.length}</div>
+        </div>
+      </div>
+      <div class="check-list">
+        ${todayPlan.sessions.map(s => {
+          const isDone = done[s.key];
+          return `<div class="check-item ${isDone ? 'done' : ''}" onclick="toggleDone('${s.key}')">
+            <div class="check-box">${isDone ? '✓' : ''}</div>
+            <div style="flex:1;">
+              <div class="check-text">${s.name || 'Subject'}</div>
+              <div class="check-sub">${s.timeLabel} &nbsp;·&nbsp; Session ${s.sessIdx} of ${s.total}</div>
+            </div>
+            <div class="pri-tag ${s.pri}">${s.pri}</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  function toggleDone(key) {
+    done[key] = !done[key];
+    saveAll();
+    renderToday();
+    renderProgress();
+  }
+
+  function renderProgress() {
+    const el = document.getElementById('progress-out');
+    if (!plan.length) { el.innerHTML = '<div class="empty">Generate a plan from the Setup tab.</div>'; return; }
+
+    const subjMap = {};
+    plan.forEach(day => day.sessions.forEach(s => {
+      if (!subjMap[s.id]) subjMap[s.id] = { name: s.name, total: 0, done: 0 };
+      subjMap[s.id].total++;
+      if (done[s.key]) subjMap[s.id].done++;
+    }));
+
+    const arr = Object.values(subjMap);
+    const totalSess = arr.reduce((a,b) => a+b.total, 0);
+    const totalDone = arr.reduce((a,b) => a+b.done, 0);
+    const overallPct = totalSess ? Math.round(totalDone/totalSess*100) : 0;
+
+    el.innerHTML = `
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-val">${totalDone}</div><div class="stat-label">Done</div></div>
+        <div class="stat-card"><div class="stat-val">${totalSess-totalDone}</div><div class="stat-label">Remaining</div></div>
+        <div class="stat-card"><div class="stat-val">${overallPct}%</div><div class="stat-label">Overall</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">By Subject</div>
+        ${arr.map(s => {
+          const pct = s.total ? Math.round(s.done/s.total*100) : 0;
+          return `<div class="prog-row">
+            <div class="prog-name">${s.name || 'Subject'}</div>
+            <div class="prog-bar-bg"><div class="prog-bar" style="width:${pct}%;"></div></div>
+            <div class="prog-pct">${pct}%</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  // Wire auto-save to all setup fields
+  ['exam-date','hours-day','session-len','break-len','start-time'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', autoSaveSetup);
+  });
+
+  // Load saved state, or seed with demo subjects if first visit
+  const hasSaved = localStorage.getItem('plandesk_subjects');
+  if (!hasSaved) {
+    addSubject('Mathematics', 'high', 8);
+    addSubject('Physics', 'high', 6);
+    addSubject('Chemistry', 'medium', 5);
+  } else {
+    loadAll();
+  }
+</script>
+</body>
+</html>
